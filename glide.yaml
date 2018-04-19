@@ -1,0 +1,6 @@
+package: github.com/lkumarjain/jn-migrate/src
+import:
+- package: github.com/lib/pq
+  version: d34b9ff171c21ad295489235aec8b6626023cd04
+- package: github.com/armon/go-metrics
+  version: 783273d703149aaeb9897cf58613d5af48861c25
