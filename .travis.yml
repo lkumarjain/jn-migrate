@@ -34,4 +34,4 @@ before_script:
   - go get honnef.co/go/tools/cmd/unused
 
 script:
-  - make
+  - make build
