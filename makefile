@@ -13,7 +13,7 @@ TARGETPATH=$(GOPATH)/bin/$(TARGET)
 #Targets
 all: dependencies linux windows darwin
 
-build: dependencies quality test linux windows darwin
+build: dependencies test linux windows darwin
 
 linux:
 	echo 'Building linux binary'
