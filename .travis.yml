@@ -5,6 +5,37 @@ go:
  - 1.8
  - tip
 
+# Don't email me the results of the test runs.
+notifications:
+  email: false
+  
 sudo: false
+
+install:
+  - go get -v github.com/Masterminds/glide
+  - cd $GOPATH/src/github.com/Masterminds/glide && git checkout 3e13fd16ed5b0808ba0fb2e4bd98eb325ccde0a1 && go install && cd -
+
+before_script:
+  - go get github.com/alecthomas/gometalinter
+  - go get github.com/golang/lint/golint                        
+  - go get honnef.co/go/tools/cmd/megacheck
+  - go get github.com/fzipp/gocyclo
+  - go get github.com/tsenart/deadcode
+  - go get github.com/opennota/check/cmd/aligncheck
+  - go get github.com/opennota/check/cmd/structcheck
+  - go get github.com/opennota/check/cmd/varcheck
+  - go get github.com/mdempsky/maligned
+  - go get -u github.com/kisielk/errcheck
+  - go get -u github.com/mibk/dupl
+  - go get honnef.co/go/tools/cmd/megacheck 
+  - go get github.com/gordonklaus/ineffassign
+  - go get github.com/mvdan/interfacer
+  - go get github.com/mdempsky/unconvert
+  - go get github.com/jgautheron/goconst/cmd/goconst
+  - go get github.com/GoASTScanner/gas/cmd/gas/...
+  - go get -u github.com/client9/misspell/cmd/misspell
+  - go get github.com/mvdan/unparam
+  - go get honnef.co/go/tools/cmd/unused
+
 script:
   - make
