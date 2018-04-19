@@ -1,4 +1,4 @@
-package: github.com/lkumarjain/jn-migrate/src
+package: github.com/lkumarjain/jn-migrate
 import:
 - package: github.com/lib/pq
   version: d34b9ff171c21ad295489235aec8b6626023cd04
