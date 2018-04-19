@@ -1,7 +1,5 @@
 language: go
 go: 
- - 1.6
- - 1.7
  - 1.8
  - tip
 
@@ -29,12 +27,12 @@ before_script:
   - go get -u github.com/mibk/dupl
   - go get honnef.co/go/tools/cmd/megacheck 
   - go get github.com/gordonklaus/ineffassign
-  - go get github.com/mvdan/interfacer
+  - go get -u github.com/mvdan/interfacer
   - go get github.com/mdempsky/unconvert
   - go get github.com/jgautheron/goconst/cmd/goconst
   - go get github.com/GoASTScanner/gas/cmd/gas/...
   - go get -u github.com/client9/misspell/cmd/misspell
-  - go get github.com/mvdan/unparam
+  - go get -u github.com/mvdan/unparam
   - go get honnef.co/go/tools/cmd/unused
 
 script:
