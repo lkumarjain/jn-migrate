@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	r := csv.GetReader(csv.Config{
+	r := csv.Reader(csv.Config{
 		Path:  "./data.cvs",
 		Comma: ';',
 		// Path:             "/home/lokesh/Downloads/DC-43251/agent_provisioning.csv",
