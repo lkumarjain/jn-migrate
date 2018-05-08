@@ -5,17 +5,17 @@ import (
 )
 
 func TestGetReader(t *testing.T) {
-	got := GetReader(Config{})
+	got := Reader(Config{})
 	_, ok := got.(reader)
 	if !ok {
-		t.Errorf("GetReader() = %v, want %v", got, reader{})
+		t.Errorf("Reader() = %v, want %v", got, reader{})
 	}
 }
 
 func TestGetReaderWithHeader(t *testing.T) {
-	got := GetReaderWithHeader(Config{}, []string{"1", "2"})
+	got := ReaderWithHeader(Config{}, []string{"1", "2"})
 	_, ok := got.(reader)
 	if !ok {
-		t.Errorf("GetReaderWithHeader() = %v, want %v", got, reader{})
+		t.Errorf("ReaderWithHeader() = %v, want %v", got, reader{})
 	}
 }

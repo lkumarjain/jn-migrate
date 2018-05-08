@@ -33,12 +33,12 @@ type reader struct {
 	reader   func(r io.Reader) *csv.Reader
 }
 
-//GetReader returns a CSV file reader
-func GetReader(cfg Config) store.Reader {
+//Reader returns a CSV file reader
+func Reader(cfg Config) store.Reader {
 	return reader{cfg: cfg, openFile: os.Open, reader: csv.NewReader}
 }
 
-//GetReaderWithHeader returns a CSV file reader with header information
-func GetReaderWithHeader(cfg Config, header []string) store.Reader {
+//ReaderWithHeader returns a CSV file reader with header information
+func ReaderWithHeader(cfg Config, header []string) store.Reader {
 	return reader{cfg: cfg, header: header, openFile: os.Open, reader: csv.NewReader}
 }
