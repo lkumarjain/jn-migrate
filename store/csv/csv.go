@@ -26,6 +26,16 @@ type Config struct {
 	HasHeader bool
 }
 
+//NewConfig is a function to create configuration object
+func NewConfig() *Config {
+	return &Config{
+		Comma:            ',',
+		Comment:          '#',
+		TrimLeadingSpace: true,
+		HasHeader:        true,
+	}
+}
+
 type reader struct {
 	cfg      Config
 	header   []string

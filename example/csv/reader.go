@@ -8,16 +8,11 @@ import (
 )
 
 func main() {
-	r := csv.Reader(csv.Config{
-		Path:  "./data.cvs",
-		Comma: ';',
-		// Path:             "/home/lokesh/Downloads/DC-43251/agent_provisioning.csv",
-		// Comma:            ',',
-		Comment:          '#',
-		HasHeader:        true,
-		TrimLeadingSpace: true,
-	})
-
+	cfg := csv.NewConfig()
+	cfg.Path = "./data.cvs"
+	cfg.Comma = ';'
+	//cfg.Path:             "/home/lokesh/Downloads/DC-43251/agent_provisioning.csv",
+	r := csv.Reader(*cfg)
 	r.Read(process)
 }
 
