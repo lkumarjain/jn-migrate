@@ -6,3 +6,5 @@ import:
   version: 783273d703149aaeb9897cf58613d5af48861c25
 - package: github.com/lib/pq
   version: d34b9ff171c21ad295489235aec8b6626023cd04
+- package: github.com/codegangsta/cli
+  version: 8e01ec4cd3e2d84ab2fe90d8210528ffbb06d8ff

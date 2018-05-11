@@ -16,7 +16,7 @@ func main() {
 		MaxParallelConnection: 3,
 		Dialect:               postgres.Dialect,
 		Schema:                "public",
-		Table:                 "test1",
+		Table:                 "test",
 	})
 	err := w.Initialize()
 	if err != nil {
@@ -37,6 +37,18 @@ func main() {
 			fmt.Println("Write ", err)
 		}
 	}
+
+	_, err = w.Write(store.Row{Columns: []store.Column{
+		store.Column{
+			Name:  "test",
+			Value: fmt.Sprintf("test-%d", 30),
+		},
+		store.Column{
+			Name:  "testint",
+			Value: fmt.Sprintf("%d", 30),
+		},
+	}})
+
 	err = w.Flush()
 	if err != nil {
 		fmt.Println("Flush ", err)
