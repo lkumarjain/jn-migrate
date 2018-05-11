@@ -27,7 +27,7 @@ const (
 	poolSize      = "poolsize"
 )
 
-//Command for CSV to SQL persistance
+//Command for CSV to SQL persistence
 var Command = cli.Command{
 	Name:  "csvtosql",
 	Usage: "Import csv into database",
