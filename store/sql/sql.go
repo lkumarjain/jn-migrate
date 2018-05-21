@@ -35,6 +35,13 @@ type Config struct {
 	MaxParallelConnection int
 }
 
+//NewConfig is a function to create configuration object
+func NewConfig() *Config {
+	return &Config{
+		MaxParallelConnection: 10,
+	}
+}
+
 var replacements = map[string]string{
 	" ": "_",
 	"/": "_",
@@ -63,7 +70,7 @@ var replacements = map[string]string{
 //toSQL is a function to convert identifier name in SQL format
 func toSQL(identifier string) string {
 	str := sanitize.BaseName(identifier)
-	str = strings.ToLower(identifier)
+	str = strings.ToLower(str)
 	str = strings.TrimSpace(str)
 
 	for oldString, newString := range replacements {
@@ -83,7 +90,6 @@ func toSQL(identifier string) string {
 
 type writer struct {
 	config           Config
-	openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 	schema           string
 	table            string
 	columns          []string
@@ -91,6 +97,7 @@ type writer struct {
 	columnSpecifiers []string
 	statement        *sql.Stmt
 	transaction      *sql.Tx
+	openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 }
 
 //Writer returns a sql writer

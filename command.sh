@@ -1,0 +1,1 @@
+ go run main.go -i csvtosql -c 'postgres://postgres:postgres@localhost:5432/postgres' -t test -f 'test,testint' -s '/home/lokesh/JunoSource/src/github.com/lkumarjain/jn-migrate/example/csv/input.csv

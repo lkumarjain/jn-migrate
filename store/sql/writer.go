@@ -10,6 +10,7 @@ import (
 )
 
 func (w *writer) Initialize() error {
+	store.Logger.Printf("Writer Configuration : %+v", w.config)
 	w.updateIdentifier()
 	db, err := w.connection()
 	if err != nil {
@@ -56,13 +57,14 @@ func (w *writer) updateIdentifier() {
 
 //connection : Tries to create a connection with DB
 func (w *writer) connection() (*sql.DB, error) {
+	store.Logger.Print("Creating Connection")
 	if w.config.ConnectionString == "" {
 		return nil, fmt.Errorf("missing connection_url")
 	}
 
 	db, err := w.openConnection(w.config.Dialect, w.config.ConnectionString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open %s connection: %v", w.config.Dialect, err)
+		return nil, fmt.Errorf("failed to open %s connection: %+v", w.config.Dialect, err)
 	}
 	db.SetMaxOpenConns(w.config.MaxParallelConnection)
 	return db, nil
@@ -70,26 +72,26 @@ func (w *writer) connection() (*sql.DB, error) {
 
 //createSchema : Tries to create the schema and ignores failures
 func (w *writer) createSchema(db *sql.DB) {
+	store.Logger.Printf("Creating Schema :: %s", w.schema)
 	createSchema, err := db.Prepare(fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", w.schema))
 	if err == nil {
-		createSchema.Exec()
+		createSchema.Exec() //nolint
 	}
 }
 
 //createTable : Create a table with TEXT columns, if does not exists
 func (w *writer) createTable(db *sql.DB) error {
+	store.Logger.Printf("Creating Table :: %s", w.table)
 	columnDefinitions := strings.Join(w.columnTypes, ",")
 	fullyQualifiedTable := fmt.Sprintf("%s.%s", w.schema, w.table)
 	tableSchema := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s)", fullyQualifiedTable, columnDefinitions)
+	store.Logger.Printf("Creating Table Using :: %s", tableSchema)
 	statement, err := db.Prepare(tableSchema)
 	if err != nil {
 		return err
 	}
 	_, err = statement.Exec()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 //createStatement : Create an insert statement by openning a transaction
@@ -103,12 +105,9 @@ func (w *writer) createStatement(db *sql.DB) error {
 	fullyQualifiedTable := fmt.Sprintf("%s.%s", w.schema, w.table)
 	values := strings.Join(w.columnSpecifiers, ",")
 	columns := strings.Join(w.columns, ",")
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", fullyQualifiedTable, columns, values)
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", fullyQualifiedTable, columns, values) //nolint
 	w.statement, err = w.transaction.Prepare(query)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 //extractColumnValue : Extract column values from a row

@@ -21,7 +21,6 @@ type Config struct {
 	// If TrimLeadingSpace is true, leading white space in a field is ignored.
 	// This is done even if the field delimiter, Comma, is white space.
 	TrimLeadingSpace bool
-
 	//HasHeader is CSV has a header? default value is true
 	HasHeader bool
 }

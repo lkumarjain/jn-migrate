@@ -5,9 +5,12 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/lkumarjain/jn-migrate/store/sql/postgres"
+
 	"github.com/codegangsta/cli"
 	"github.com/lkumarjain/jn-migrate/store"
 	"github.com/lkumarjain/jn-migrate/store/csv"
+	"github.com/lkumarjain/jn-migrate/store/sql"
 )
 
 const (
@@ -68,7 +71,7 @@ var Command = cli.Command{
 		},
 		cli.StringFlag{
 			Name:   fmt.Sprintf("%s, %s", dbName, "db"),
-			Value:  "postgres",
+			Value:  postgres.Dialect,
 			Usage:  "database to connect to",
 			EnvVar: "DB_NAME",
 		},
@@ -92,22 +95,69 @@ var Command = cli.Command{
 	Action: action,
 }
 
-func action(c *cli.Context) {
+func action(ctx *cli.Context) {
 	cli.CommandHelpTemplate = strings.Replace(cli.CommandHelpTemplate, "[arguments...]", "<csv-file>", -1)
+
+	sCfg := sql.NewConfig()
+	sCfg.ConnectionString = ctx.String(connectionURL)
+	sCfg.Dialect = ctx.String(dbName)
+	sCfg.Schema = ctx.String(schema)
+	sCfg.Table = ctx.String(table)
+	sCfg.MaxParallelConnection = ctx.Int(poolSize)
+	sCfg.Columns = strings.Split(ctx.String(fields), ",")
+
+	handler := &writeHandler{
+		ignoreErrors: ctx.GlobalBool("ignore-errors"),
+		writer:       sql.Writer(*sCfg),
+	}
+
+	if len(sCfg.Columns) != 0 {
+		handler.initialize()
+	}
+
 	conf := csv.NewConfig()
-	conf.Path = c.String(source)
-	conf.Comma, _ = utf8.DecodeRuneInString(c.String(delimiter))
-	conf.Comment, _ = utf8.DecodeRuneInString(c.String(comment))
-	conf.TrimLeadingSpace = c.Bool(trimSpace)
-	fields := c.String(fields)
-	conf.HasHeader = fields == ""
-	r := csv.Reader(*conf)
-	r.Read(process)
+	conf.Path = ctx.String(source)
+	conf.Comma, _ = utf8.DecodeRuneInString(ctx.String(delimiter))
+	conf.Comment, _ = utf8.DecodeRuneInString(ctx.String(comment))
+	conf.TrimLeadingSpace = ctx.Bool(trimSpace)
+	conf.HasHeader = true //fields == ""
+	r := csv.ReaderWithHeader(*conf, sCfg.Columns)
+	r.Read(handler.process)
+
+	err := handler.writer.Flush()
+	if err != nil {
+		store.Logger.Printf("Failed to write Records : %+v", err)
+	}
 }
 
-func process(row store.Row) {
+type writeHandler struct {
+	ignoreErrors bool
+	writer       store.Writer
+}
+
+func (h *writeHandler) initialize() {
+	err := h.writer.Initialize()
+	if err != nil {
+		panic(fmt.Errorf("Failed to initialize writer : %+v", err))
+	}
+}
+
+func (h *writeHandler) process(row store.Row) {
 	if row.Error != nil {
-		//fmt.Printf("Record : %+v, Error :: %v\n", row.RowNumber, row.Error)
-		fmt.Printf("Record : %+v\n", row)
+		if h.ignoreErrors {
+			store.Logger.Printf("Failed to read Record : %+v", row)
+		} else {
+			panic(fmt.Errorf("Failed to read Record : %+v", row))
+		}
+		return
+	}
+	_, err := h.writer.Write(row)
+	if err != nil {
+		if h.ignoreErrors {
+			store.Logger.Printf("Failed to write Record : %+v with error : %+v", row, err)
+		} else {
+			panic(fmt.Errorf("Failed to write Record : %+v with error : %+v", row, err))
+		}
+		return
 	}
 }

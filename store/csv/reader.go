@@ -13,6 +13,7 @@ func (r reader) Read(record store.Record) {
 		panic(fmt.Errorf("Unable to Open File :: %s with Error :: %v", r.cfg.Path, err))
 	}
 	defer file.Close() //nolint
+	store.Logger.Printf("Reading csv using configuration : %+v", r.cfg)
 	r.read(file, record)
 }
 
