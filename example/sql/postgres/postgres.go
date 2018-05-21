@@ -49,6 +49,10 @@ func main() {
 		},
 	}})
 
+	if err != nil {
+		fmt.Println("Flush ", err)
+	}
+
 	err = w.Flush()
 	if err != nil {
 		fmt.Println("Flush ", err)

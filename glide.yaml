@@ -8,3 +8,6 @@ import:
   version: d34b9ff171c21ad295489235aec8b6626023cd04
 - package: github.com/codegangsta/cli
   version: 8e01ec4cd3e2d84ab2fe90d8210528ffbb06d8ff
+testImports:
+- package: github.com/andizzle/go-fakedb
+  version: 1a6c3a6f8b7af9dd89df610646e837142287375c
