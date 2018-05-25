@@ -7,9 +7,9 @@ import (
 	"github.com/lkumarjain/jn-migrate/store/csv"
 )
 
-func main() {
+func read() {
 	cfg := csv.NewConfig()
-	cfg.Path = "./data.cvs"
+	cfg.Path = "./data.csv"
 	cfg.Comma = ';'
 	//cfg.Path:             "/home/lokesh/Downloads/DC-43251/agent_provisioning.csv",
 	r := csv.Reader(*cfg)

@@ -31,7 +31,9 @@ func (r reader) read(file io.Reader, record store.Record) {
 		}
 
 		if count == 0 && r.cfg.HasHeader {
-			r.header = result
+			if len(r.cfg.Header) == 0 {
+				r.cfg.Header = result
+			}
 			continue
 		}
 		record(store.Row{RowNumber: count, Columns: r.readColumns(result), Error: err})
@@ -39,7 +41,7 @@ func (r reader) read(file io.Reader, record store.Record) {
 }
 
 func (r reader) readColumns(result []string) []store.Column {
-	size := len(r.header)
+	size := len(r.cfg.Header)
 	if size == 0 {
 		panic(fmt.Errorf("Header value not available for file :: %s", r.cfg.Path))
 	}
@@ -47,7 +49,7 @@ func (r reader) readColumns(result []string) []store.Column {
 	columns := make([]store.Column, size)
 	index := 0
 	for ; index < size; index++ {
-		columns[index] = store.Column{ColumnNumber: index, Name: r.header[index], Value: r.readValue(result, index)}
+		columns[index] = store.Column{ColumnNumber: index, Name: r.cfg.Header[index], Value: r.readValue(result, index)}
 	}
 	return columns
 }

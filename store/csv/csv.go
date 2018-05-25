@@ -23,6 +23,8 @@ type Config struct {
 	TrimLeadingSpace bool
 	//HasHeader is CSV has a header? default value is true
 	HasHeader bool
+	//CSV headers; If blank will be populated automatically, by reading CSV or Row
+	Header []string
 }
 
 //NewConfig is a function to create configuration object
@@ -37,7 +39,6 @@ func NewConfig() *Config {
 
 type reader struct {
 	cfg      Config
-	header   []string
 	openFile func(name string) (*os.File, error)
 	reader   func(r io.Reader) *csv.Reader
 }
@@ -47,7 +48,20 @@ func Reader(cfg Config) store.Reader {
 	return reader{cfg: cfg, openFile: os.Open, reader: csv.NewReader}
 }
 
-//ReaderWithHeader returns a CSV file reader with header information
-func ReaderWithHeader(cfg Config, header []string) store.Reader {
-	return reader{cfg: cfg, header: header, openFile: os.Open, reader: csv.NewReader}
+type writer struct {
+	config Config
+	writer *csv.Writer
+	closer io.Closer
+}
+
+//Writer returns a CSV writer
+func Writer(config Config) store.Writer {
+	return &writer{config: config}
+}
+
+//InitiailzedWriter returns a Initiailzed CSV writer
+func InitiailzedWriter(config Config) (store.Writer, error) {
+	w := &writer{config: config}
+	err := w.Initialize()
+	return w, err
 }

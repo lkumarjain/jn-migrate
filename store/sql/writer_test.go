@@ -2,7 +2,6 @@ package sql
 
 import (
 	"database/sql"
-	"errors"
 	"testing"
 
 	_ "github.com/andizzle/go-fakedb"
@@ -19,7 +18,6 @@ func Test_writer_Initialize(t *testing.T) {
 		columnSpecifiers []string
 		statement        *sql.Stmt
 		transaction      *sql.Tx
-		openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 	}
 	tests := []struct {
 		name    string
@@ -34,8 +32,7 @@ func Test_writer_Initialize(t *testing.T) {
 		{
 			name: "Open-Connection-Failure",
 			fields: fields{
-				config:         Config{ConnectionString: "1", Columns: []string{"1", "2"}},
-				openConnection: func(driverName, dataSourceName string) (*sql.DB, error) { return nil, errors.New("Error") },
+				config: Config{ConnectionString: "1", Columns: []string{"1", "2"}},
 			},
 			wantErr: true,
 		},
@@ -49,7 +46,6 @@ func Test_writer_Initialize(t *testing.T) {
 					Table:            "fakeTable",
 					Schema:           "fakeSchema",
 				},
-				openConnection: sql.Open,
 			},
 			wantErr: false,
 		},
@@ -65,7 +61,6 @@ func Test_writer_Initialize(t *testing.T) {
 				columnSpecifiers: tt.fields.columnSpecifiers,
 				statement:        tt.fields.statement,
 				transaction:      tt.fields.transaction,
-				openConnection:   tt.fields.openConnection,
 			}
 			if err := w.Initialize(); (err != nil) != tt.wantErr {
 				t.Errorf("writer.Initialize() error = %v, wantErr %v", err, tt.wantErr)
@@ -84,7 +79,6 @@ func Test_writer_Write(t *testing.T) {
 		columnSpecifiers []string
 		statement        *sql.Stmt
 		transaction      *sql.Tx
-		openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 	}
 	type args struct {
 		record store.Row
@@ -104,7 +98,7 @@ func Test_writer_Write(t *testing.T) {
 				Dialect:          "fakedb",
 				Table:            "fakeTable",
 				Schema:           "fakeSchema",
-			}, openConnection: sql.Open,
+			},
 				statement: &sql.Stmt{},
 			},
 			args: args{record: store.Row{
@@ -127,7 +121,6 @@ func Test_writer_Write(t *testing.T) {
 				columnSpecifiers: tt.fields.columnSpecifiers,
 				statement:        tt.fields.statement,
 				transaction:      tt.fields.transaction,
-				openConnection:   tt.fields.openConnection,
 			}
 			w.Initialize()
 			got, err := w.Write(tt.args.record)
@@ -152,7 +145,6 @@ func Test_writer_Flush(t *testing.T) {
 		columnSpecifiers []string
 		statement        *sql.Stmt
 		transaction      *sql.Tx
-		openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 	}
 	tests := []struct {
 		name    string
@@ -167,7 +159,7 @@ func Test_writer_Flush(t *testing.T) {
 				Dialect:          "fakedb",
 				Table:            "fakeTable",
 				Schema:           "fakeSchema",
-			}, openConnection: sql.Open,
+			},
 				statement: &sql.Stmt{},
 			},
 			wantErr: false,
@@ -184,7 +176,6 @@ func Test_writer_Flush(t *testing.T) {
 				columnSpecifiers: tt.fields.columnSpecifiers,
 				statement:        tt.fields.statement,
 				transaction:      tt.fields.transaction,
-				openConnection:   tt.fields.openConnection,
 			}
 			w.Initialize()
 			if err := w.Flush(); (err != nil) != tt.wantErr {

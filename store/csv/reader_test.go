@@ -15,7 +15,6 @@ import (
 func Test_reader_Read(t *testing.T) {
 	type fields struct {
 		cfg      Config
-		header   []string
 		openFile func(name string) (*os.File, error)
 		reader   func(r io.Reader) *csv.Reader
 	}
@@ -30,7 +29,7 @@ func Test_reader_Read(t *testing.T) {
 	}{
 		{
 			name: "1-Open-Error",
-			fields: fields{cfg: Config{}, header: []string{},
+			fields: fields{cfg: Config{},
 				openFile: func(name string) (*os.File, error) { return nil, errors.New("Error") },
 				reader:   func(r io.Reader) *csv.Reader { return csv.NewReader(strings.NewReader("in")) },
 			},
@@ -39,7 +38,7 @@ func Test_reader_Read(t *testing.T) {
 		},
 		{
 			name: "2-Open-Success",
-			fields: fields{cfg: Config{}, header: []string{"h"},
+			fields: fields{cfg: Config{Header: []string{"h"}},
 				openFile: func(name string) (*os.File, error) { return &os.File{}, nil },
 				reader: func(r io.Reader) *csv.Reader {
 					rd := csv.NewReader(strings.NewReader("in"))
@@ -56,7 +55,7 @@ func Test_reader_Read(t *testing.T) {
 		},
 		{
 			name: "3-Open-Success-Has-Header",
-			fields: fields{cfg: Config{HasHeader: true}, header: []string{"h"},
+			fields: fields{cfg: Config{HasHeader: true, Header: []string{"h"}},
 				openFile: func(name string) (*os.File, error) { return &os.File{}, nil },
 				reader: func(r io.Reader) *csv.Reader {
 					rd := csv.NewReader(strings.NewReader("in"))
@@ -73,7 +72,7 @@ func Test_reader_Read(t *testing.T) {
 		},
 		{
 			name: "4-Success",
-			fields: fields{cfg: Config{}, header: []string{"h"},
+			fields: fields{cfg: Config{Header: []string{"h"}},
 				openFile: func(name string) (*os.File, error) { return &os.File{}, nil },
 				reader:   func(r io.Reader) *csv.Reader { return csv.NewReader(strings.NewReader("in")) },
 			},
@@ -97,7 +96,6 @@ func Test_reader_Read(t *testing.T) {
 			}
 			r := reader{
 				cfg:      tt.fields.cfg,
-				header:   tt.fields.header,
 				openFile: tt.fields.openFile,
 				reader:   tt.fields.reader,
 			}
@@ -108,8 +106,7 @@ func Test_reader_Read(t *testing.T) {
 
 func Test_reader_readValue(t *testing.T) {
 	type fields struct {
-		cfg    Config
-		header []string
+		cfg Config
 	}
 	type args struct {
 		result []string
@@ -149,8 +146,7 @@ func Test_reader_readValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := reader{
-				cfg:    tt.fields.cfg,
-				header: tt.fields.header,
+				cfg: tt.fields.cfg,
 			}
 			if got := r.readValue(tt.args.result, tt.args.index); got != tt.want {
 				t.Errorf("reader.readValue() = %v, want %v", got, tt.want)
@@ -161,8 +157,7 @@ func Test_reader_readValue(t *testing.T) {
 
 func Test_reader_readColumns(t *testing.T) {
 	type fields struct {
-		cfg    Config
-		header []string
+		cfg Config
 	}
 	type args struct {
 		result []string
@@ -183,7 +178,7 @@ func Test_reader_readColumns(t *testing.T) {
 		},
 		{
 			name:   "2",
-			fields: fields{header: []string{"1", "2"}},
+			fields: fields{cfg: Config{Header: []string{"1", "2"}}},
 			args:   args{result: []string{"1", "2"}},
 			want: []store.Column{
 				store.Column{ColumnNumber: 0, Name: "1", Value: "1"},
@@ -193,7 +188,7 @@ func Test_reader_readColumns(t *testing.T) {
 		},
 		{
 			name:   "3",
-			fields: fields{header: []string{"1", "2"}},
+			fields: fields{cfg: Config{Header: []string{"1", "2"}}},
 			args:   args{result: []string{"1"}},
 			want: []store.Column{
 				store.Column{ColumnNumber: 0, Name: "1", Value: "1"},
@@ -211,8 +206,7 @@ func Test_reader_readColumns(t *testing.T) {
 				}
 			}()
 			r := reader{
-				cfg:    tt.fields.cfg,
-				header: tt.fields.header,
+				cfg: tt.fields.cfg,
 			}
 			if got := r.readColumns(tt.args.result); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("reader.readColumns() = %v, want %v", got, tt.want)
