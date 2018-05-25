@@ -58,7 +58,7 @@ func Test_toSQL(t *testing.T) {
 			exactMatch: true,
 		},
 		{
-			name:       "Spacial-Charactor-Identifier",
+			name:       "Spacial-Character-Identifier",
 			args:       args{"Column/1#2"},
 			want:       "column1_2",
 			exactMatch: true,

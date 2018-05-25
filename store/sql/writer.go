@@ -62,7 +62,7 @@ func (w *writer) connection() (*sql.DB, error) {
 		return nil, fmt.Errorf("missing connection_url")
 	}
 
-	db, err := w.openConnection(w.config.Dialect, w.config.ConnectionString)
+	db, err := sql.Open(w.config.Dialect, w.config.ConnectionString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %s connection: %+v", w.config.Dialect, err)
 	}

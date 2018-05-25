@@ -97,10 +97,16 @@ type writer struct {
 	columnSpecifiers []string
 	statement        *sql.Stmt
 	transaction      *sql.Tx
-	openConnection   func(driverName, dataSourceName string) (*sql.DB, error)
 }
 
 //Writer returns a sql writer
 func Writer(config Config) store.Writer {
-	return &writer{config: config, openConnection: sql.Open}
+	return &writer{config: config}
+}
+
+//InitiailzedWriter returns a Initiailzed sql writer
+func InitiailzedWriter(config Config) (store.Writer, error) {
+	w := &writer{config: config}
+	err := w.Initialize()
+	return w, err
 }

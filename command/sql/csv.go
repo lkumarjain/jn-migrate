@@ -120,8 +120,10 @@ func action(ctx *cli.Context) {
 	conf.Comma, _ = utf8.DecodeRuneInString(ctx.String(delimiter))
 	conf.Comment, _ = utf8.DecodeRuneInString(ctx.String(comment))
 	conf.TrimLeadingSpace = ctx.Bool(trimSpace)
-	conf.HasHeader = true //fields == ""
-	r := csv.ReaderWithHeader(*conf, sCfg.Columns)
+	conf.HasHeader = true
+	conf.Header = sCfg.Columns
+
+	r := csv.Reader(*conf)
 	r.Read(handler.process)
 
 	err := handler.writer.Flush()
