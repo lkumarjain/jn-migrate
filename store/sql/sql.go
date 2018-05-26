@@ -110,3 +110,18 @@ func InitiailzedWriter(config Config) (store.Writer, error) {
 	err := w.Initialize()
 	return w, err
 }
+
+//connection : Tries to create a connection with DB
+func connection(config Config) (*sql.DB, error) {
+	store.Logger.Print("Creating Connection")
+	if config.ConnectionString == "" {
+		return nil, fmt.Errorf("missing connection_url")
+	}
+
+	db, err := sql.Open(config.Dialect, config.ConnectionString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open %s connection: %+v", config.Dialect, err)
+	}
+	db.SetMaxOpenConns(config.MaxParallelConnection)
+	return db, nil
+}

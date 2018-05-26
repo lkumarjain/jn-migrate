@@ -12,7 +12,7 @@ import (
 func (w *writer) Initialize() error {
 	store.Logger.Printf("Writer Configuration : %+v", w.config)
 	w.updateIdentifier()
-	db, err := w.connection()
+	db, err := connection(w.config)
 	if err != nil {
 		return err
 	}
@@ -53,21 +53,6 @@ func (w *writer) updateIdentifier() {
 		w.columnSpecifiers[i] = "$" + strconv.Itoa(i+1)
 		w.columns[i] = column
 	}
-}
-
-//connection : Tries to create a connection with DB
-func (w *writer) connection() (*sql.DB, error) {
-	store.Logger.Print("Creating Connection")
-	if w.config.ConnectionString == "" {
-		return nil, fmt.Errorf("missing connection_url")
-	}
-
-	db, err := sql.Open(w.config.Dialect, w.config.ConnectionString)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open %s connection: %+v", w.config.Dialect, err)
-	}
-	db.SetMaxOpenConns(w.config.MaxParallelConnection)
-	return db, nil
 }
 
 //createSchema : Tries to create the schema and ignores failures

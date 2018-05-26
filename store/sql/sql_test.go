@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/lkumarjain/jn-migrate/store"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -75,6 +77,42 @@ func Test_toSQL(t *testing.T) {
 			got := toSQL(tt.args.identifier)
 			if (tt.exactMatch && got != tt.want) && (!tt.exactMatch && !strings.Contains(got, tt.want)) {
 				t.Errorf("toSQL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInitiailzedWriter(t *testing.T) {
+	type args struct {
+		config Config
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    store.Writer
+		wantErr bool
+	}{
+		{
+			name:    "Initialization Error",
+			args:    args{config: Config{Dialect: "test"}},
+			wantErr: true,
+		},
+		{
+			name:    "Initialization Error",
+			args:    args{config: Config{Dialect: "fakedb", ConnectionString: "connection"}},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := InitiailzedWriter(tt.args.config)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("InitiailzedWriter() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			_, ok := got.(*writer)
+			if !ok {
+				t.Errorf("Writer() = %v, want %v", got, "writer")
 			}
 		})
 	}
