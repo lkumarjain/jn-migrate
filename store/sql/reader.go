@@ -18,9 +18,9 @@ func (r *reader) Read(record store.Record) {
 	if err != nil {
 		panic(fmt.Errorf("Failed to execute Query %+v", err))
 	}
-	defer rows.Close()
-	defer r.statement.Close()
-	defer r.db.Close()
+	defer rows.Close() //nolint
+	defer r.statement.Close() //nolint
+	defer r.db.Close() //nolint
 	columnNames, err := rows.Columns()
 	if err != nil {
 		panic(fmt.Errorf("Failed to find column %+v", err))
