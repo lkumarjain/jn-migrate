@@ -16,7 +16,7 @@ func (w *writer) Initialize() error {
 	if err != nil {
 		return err
 	}
-
+	w.db = db
 	w.createSchema(db)
 
 	err = w.createTable(db)
