@@ -88,6 +88,20 @@ func toSQL(identifier string) string {
 	return str
 }
 
+type reader struct {
+	config    Config
+	schema    string
+	table     string
+	columns   []string
+	statement *sql.Stmt
+	db        *sql.DB
+}
+
+//Reader returns a sql reader
+func Reader(config Config) store.Reader {
+	return &reader{config: config}
+}
+
 type writer struct {
 	config           Config
 	schema           string
@@ -97,6 +111,7 @@ type writer struct {
 	columnSpecifiers []string
 	statement        *sql.Stmt
 	transaction      *sql.Tx
+	db               *sql.DB
 }
 
 //Writer returns a sql writer
